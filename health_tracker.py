@@ -30,15 +30,24 @@ class HealthTracker:
             else:
                 return None
         return None    
-              
-    
+
+
     def delete_record():
         pass
 
-    def get_all_record():
+    def get_all_records():
         pass
 
-
-    def save_data():
+    def get_dates_set():
         pass
-    
+
+    def get_weekly_records():
+      pass
+
+
+def daily_summary(self, date):
+    record = self.get_record(date)
+    if record:
+        return record.json_data()
+
+    return None

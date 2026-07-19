@@ -45,9 +45,57 @@ class HealthTracker:
       pass
 
 
-def daily_summary(self, date):
-    record = self.get_record(date)
-    if record:
-        return record.json_data()
+    def weekly_summary(self, end_date=None):
+      
+        weekly_data = self.get_weekly_records(end_date)
+        if not weekly_data:
+            return None
 
-    return None
+        sleep = []
+        water = []
+        exercise = []
+        screen = []
+        study = []
+
+        for record in weekly_data:
+            sleep.append(record.sleep)
+            water.append(record.water)
+            exercise.append(record.exercise)
+            screen.append(record.screen_time)
+            study.append(record.study_hours)
+
+        sleep_time = np.array(sleep)
+        water_consume = np.array(water)
+        exercise_time = np.array(exercise)
+        screen_time = np.array(screen)
+        study_hour = np.array(study)
+
+        avg_sleep = np.mean(sleep_time)
+        avg_water = np.mean(water_consume)
+        avg_exercise = np.mean(exercise_time)
+        avg_screen = np.mean(screen_time)
+        avg_study = np.mean(study_hour)
+
+        total_sleep = np.sum(sleep_time)
+        total_water = np.sum(water_consume)
+        total_exercise = np.sum(exercise_time)
+        total_screen = np.sum(screen_time)
+        total_study = np.sum(study_hour)
+
+        return {
+            'average': {
+                'sleep': avg_sleep,
+                'water': avg_water,
+                'exercise': avg_exercise,
+                'screen_time': avg_screen,
+                'study_hours': avg_study
+            },
+            'total': {
+                'sleep': total_sleep,
+                'water': total_water,
+                'exercise': total_exercise,
+                'screen_time': total_screen,
+                'study_hours': total_study
+            },
+            'numOfDays': len(weekly_data)
+        }

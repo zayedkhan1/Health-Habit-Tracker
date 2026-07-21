@@ -140,3 +140,18 @@ class HealthTracker:
             warnings.append("Study hours are too high.")
 
         return warnings
+    
+    def save_data(self):
+        data = []
+
+        for record in self.records:
+
+            dict = record.json_data()
+
+            data.append(dict)
+
+        file = open(self.filename, "w")
+
+        json.dump(data, file, indent=2)
+
+        file.close()

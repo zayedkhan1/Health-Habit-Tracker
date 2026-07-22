@@ -155,3 +155,22 @@ class HealthTracker:
         json.dump(data, file, indent=2)
 
         file.close()
+
+    def load_data(self):
+
+        if not os.path.exists(self.filename):
+            self.records = []
+            return
+
+        try:
+            with open(self.filename, "r") as file:
+                data = json.load(file)
+
+            self.records = []
+
+            for item in data:
+                record = HealthRecord.from_dict(item)
+                self.records.append(record)
+
+        except:
+            self.records = []

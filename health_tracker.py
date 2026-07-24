@@ -68,6 +68,40 @@ def delete_record(self, date):
     self.records = new_records
     self.save_data()
 
+def get_all_records(self):
+    
+    return self.records
 
+
+def get_dates_set(self):
+    
+    dates = set()
+
+    for record in self.records:
+        dates.add(record.date)
+
+    return dates
+
+
+def get_weekly_records(self, end_date=None):
+    
+
+    if end_date is None:
+        end_date = datetime.today().date()
+    else:
+        if type(end_date) == str:
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    start_date = end_date - timedelta(days=6)
+
+    weekly_records = []
+
+    for record in self.records:
+        current_date = datetime.strptime(record.date, "%Y-%m-%d").date()
+
+        if current_date >= start_date and current_date <= end_date:
+            weekly_records.append(record)
+
+    return weekly_records
 
     

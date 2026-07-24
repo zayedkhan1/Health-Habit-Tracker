@@ -38,7 +38,36 @@ class HealthTracker:
     def get_all_record():
         pass
 
+    
+    def get_dates_set():
+        pass
+
+    def get_weekly_records():
+      pass
 
     def save_data():
         pass
+    from datetime import datetime, timedelta
+
+def get_record(self, date):
+    
+    for record in self.records:
+        if record.date == date:
+            return record
+    return None
+
+
+def delete_record(self, date):
+    
+    new_records = []
+
+    for record in self.records:
+        if record.date != date:
+            new_records.append(record)
+
+    self.records = new_records
+    self.save_data()
+
+
+
     

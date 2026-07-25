@@ -1,7 +1,7 @@
 import numpy as np
 import json
 import os
-import datetime
+from datetime import datetime, timedelta
 from record import HealthRecord
 
 class HealthTracker:
@@ -9,6 +9,7 @@ class HealthTracker:
     def __init__(self,filename='health_tracker.py'):
         self.filename=filename
         self.records=[]
+        self.load_data()
 
 
 
@@ -23,26 +24,21 @@ class HealthTracker:
         self.records.append(record)
         self.save_data()
 
-    def get_record(self,date):
-        for record in self.records:
-            if record.date==date:
-                return record
-            else:
-                return None
-        return None    
+    # def get_record(self,date):
+    #     for record in self.records:
+    #         if record.date==date:
+    #             return record
+    #         else:
+    #             return None
+    #     return None    
 
 
-    def delete_record():
-        pass
-
-    def get_all_records():
-        pass
-
-    def get_dates_set():
-        pass
-
-    def get_weekly_records():
-      pass
+    def daily_summary(self, date):
+        """Return a dictionary summary for a single day, or None if no record."""
+        record = self.get_record(date)
+        if record:
+            return record.json_data()
+        return None
 
 
     def weekly_summary(self, end_date=None):
@@ -62,7 +58,7 @@ class HealthTracker:
             water.append(record.water)
             exercise.append(record.exercise)
             screen.append(record.screen_time)
-            study.append(record.study_hours)
+            study.append(record.study_hour)
 
         sleep_time = np.array(sleep)
         water_consume = np.array(water)
@@ -134,9 +130,9 @@ class HealthTracker:
             warnings.append("Screen time is too high.")
 
         
-        if record.study_hours < 2:
+        if record.study_hour < 2:
             warnings.append("Study hours are too low.")
-        elif record.study_hours > 4:
+        elif record.study_hour > 4:
             warnings.append("Study hours are too high.")
 
         return warnings

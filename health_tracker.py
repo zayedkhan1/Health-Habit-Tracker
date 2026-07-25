@@ -4,6 +4,7 @@ import os
 from datetime import datetime, timedelta
 from record import HealthRecord
 
+
 class HealthTracker:
 
     def __init__(self,filename='health_tracker.py'):
@@ -96,39 +97,32 @@ class HealthTracker:
             'numOfDays': len(weekly_data)
         }
     
-    def get_warnings(self, date=None):
 
-        if date is None:
-            date = datetime.today().date().isoformat()
-
-        record = self.get_record(date)
-
-        warnings = []
-
-        if record is None:
-            return warnings
-
-        if record.sleep < 7:
-            warnings.append("Sleep is too low.")
-        elif record.sleep > 9:
-            warnings.append("Sleep is too high.")
-
-      
-        if record.water < 8:
-            warnings.append("Water intake is too low.")
-        elif record.water > 12:
-            warnings.append("Water intake is too high.")
-
+    def get_record(self, date):
         
-        if record.exercise < 30:
-            warnings.append("Exercise is too low.")
-        elif record.exercise > 60:
-            warnings.append("Exercise is too high.")
+        for record in self.records:
+            if record.date == date:
+                return record
+        return None
 
-      
-        if record.screen_time > 3:
-            warnings.append("Screen time is too high.")
 
+    def delete_record(self, date):
+        
+        new_records = []
+
+        for record in self.records:
+            if record.date != date:
+                new_records.append(record)
+
+        self.records = new_records
+        self.save_data()
+
+    def get_all_records(self):
+        
+        return self.records
+
+
+    def get_dates_set(self):
         
         if record.study_hour < 2:
             warnings.append("Study hours are too low.")
@@ -139,34 +133,33 @@ class HealthTracker:
     
     def save_data(self):
         data = []
+        dates = set()
 
         for record in self.records:
+            dates.add(record.date)
 
-            dict = record.json_data()
+        return dates
 
-            data.append(dict)
 
-        file = open(self.filename, "w")
+    def get_weekly_records(self, end_date=None):
+        
 
-        json.dump(data, file, indent=2)
+        if end_date is None:
+            end_date = datetime.today().date()
+        else:
+            if type(end_date) == str:
+                end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-        file.close()
+        start_date = end_date - timedelta(days=6)
 
-    def load_data(self):
+        weekly_records = []
 
-        if not os.path.exists(self.filename):
-            self.records = []
-            return
+        for record in self.records:
+            current_date = datetime.strptime(record.date, "%Y-%m-%d").date()
 
-        try:
-            with open(self.filename, "r") as file:
-                data = json.load(file)
+            if current_date >= start_date and current_date <= end_date:
+                weekly_records.append(record)
 
-            self.records = []
+        return weekly_records
 
-            for item in data:
-                record = HealthRecord.from_dict(item)
-                self.records.append(record)
-
-        except:
-            self.records = []
+        

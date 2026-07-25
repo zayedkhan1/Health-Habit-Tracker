@@ -164,3 +164,48 @@ class HealthApp:
                    command=self.delete_record).pack(side='left', padx=5)
 
         self.refresh_view()
+
+   
+        # Bind double-click to edit
+        self.tree.bind('<Double-1>', lambda e: self.edit_record())
+
+    def refresh_view(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        records = sorted(self.tracker.get_all_records(), key=lambda r: r.date)
+        for rec in records:
+            # Alternate row colors are handled by the theme's 'alternate' style
+            self.tree.insert('', 'end', values=(rec.date, rec.sleep, rec.water,
+                                                rec.exercise, rec.screen_time, rec.study_hour))
+
+    def edit_record(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("No selection", "Please select a record to edit.")
+            return
+        values = self.tree.item(selected[0], 'values')
+        date = values[0]
+
+        # Create edit window
+        edit_win = tk.Toplevel(self.root)
+        edit_win.title("✏️ Edit Record")
+        edit_win.geometry("400x350")
+        edit_win.configure(bg='#f0f4f8')
+        edit_win.transient(self.root)  # make it modal-like
+        edit_win.grab_set()
+
+        fields = ['Sleep (hours)', 'Water (glasses)', 'Exercise (minutes)',
+                  'Screen Time (hours)', 'Study Hours (hours)']
+        entries = {}
+
+        label_title = ttk.Label(edit_win, text=f"Editing record for {date}",
+                                font=('Segoe UI', 12, 'bold'), foreground='#2c3e50')
+        label_title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
+
+        for i, field in enumerate(fields):
+            label = ttk.Label(edit_win, text=field, font=('Segoe UI', 10))
+            label.grid(row=i+1, column=0, padx=10, pady=8, sticky='e')
+            entry = ttk.Entry(edit_win, width=25, font=('Segoe UI', 10))
+            entry.grid(row=i+1, column=1, padx=10, pady=8)
+            entry.insert(0, values[i+1])  # values[0] is date
+            entries[field] = entry

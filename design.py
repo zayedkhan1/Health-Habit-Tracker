@@ -269,3 +269,33 @@ class HealthApp:
                                     font=('Segoe UI', 10), bg='white', fg='#2c3e50',
                                     relief='solid', bd=1)
         self.summary_text.pack(pady=10, padx=10, fill='both', expand=True)
+
+    def show_daily_summary(self):
+        date_str = self.summary_date_entry.get().strip()
+        if not dateValidation(date_str):
+            messagebox.showerror("Invalid Date", "Please enter a valid date.")
+            return
+        summary = self.tracker.daily_summary(date_str)
+        self.summary_text.delete(1.0, tk.END)
+        if summary is None:
+            self.summary_text.insert(tk.END, f"No record for {date_str}.\n")
+        else:
+            self.summary_text.insert(tk.END, f"📋 Daily Summary for {date_str}:\n\n")
+            for key, val in summary.items():
+                if key != 'date':
+                    self.summary_text.insert(tk.END, f"• {key.replace('_', ' ').title()}: {val}\n")
+
+    def show_weekly_summary(self):
+        summary = self.tracker.weekly_summary()
+        self.summary_text.delete(1.0, tk.END)
+        if summary is None:
+            self.summary_text.insert(tk.END, "No records for the past week.\n")
+        else:
+            self.summary_text.insert(tk.END, "📊 Weekly Summary (last 7 days)\n")
+            self.summary_text.insert(tk.END, f"Days recorded: {summary['numOfDays']}\n\n")
+            self.summary_text.insert(tk.END, "Averages:\n")
+            for key, val in summary['average'].items():
+                self.summary_text.insert(tk.END, f"  • {key.replace('_', ' ').title()}: {val:.2f}\n")
+            self.summary_text.insert(tk.END, "\nTotals:\n")
+            for key, val in summary['total'].items():
+                self.summary_text.insert(tk.END, f"  • {key.replace('_', ' ').title()}: {val:.2f}\n")

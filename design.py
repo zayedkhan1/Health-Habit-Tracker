@@ -106,3 +106,31 @@ class HealthApp:
         clear_btn = ttk.Button(btn_frame, text="🗑️ Clear Fields", style='Primary.TButton',
                                command=self.clear_add_fields)
         clear_btn.pack(side='left', padx=10)
+
+    def clear_add_fields(self):
+        for key in self.add_entries:
+            self.add_entries[key].delete(0, tk.END)
+        self.add_entries['Date (YYYY-MM-DD)'].insert(0, datetime.date.today().isoformat())
+
+    def add_record(self):
+        date_str = self.add_entries['Date (YYYY-MM-DD)'].get().strip()
+        if not dateValidation(date_str):
+            messagebox.showerror("Invalid Date", "Please enter a valid date in YYYY-MM-DD format.")
+            return
+        try:
+            sleep = float(self.add_entries['Sleep (hours)'].get().strip())
+            water = float(self.add_entries['Water (glasses)'].get().strip())
+            exercise = float(self.add_entries['Exercise (minutes)'].get().strip())
+            screen = float(self.add_entries['Screen Time (hours)'].get().strip())
+            study = float(self.add_entries['Study Hours (hours)'].get().strip())
+        except ValueError:
+            messagebox.showerror("Invalid Input", "Please enter numeric values for all metrics.")
+            return
+        if any(v < 0 for v in [sleep, water, exercise, screen, study]):
+            messagebox.showerror("Invalid Input", "Values cannot be negative.")
+            return
+
+        record = HealthRecord(date_str, sleep, water, exercise, screen, study)
+        self.tracker.add_record(record)
+        messagebox.showinfo("Success", "Record saved successfully.")
+        self.clear_add_fields()

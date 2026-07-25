@@ -247,3 +247,25 @@ class HealthApp:
             self.tracker.delete_record(date)
             self.refresh_view()
             messagebox.showinfo("Success", "Record deleted.")
+  
+  
+   # ---------- Summary Tab ----------
+    def setup_summary_frame(self):
+        # Input row
+        input_frame = ttk.Frame(self.summary_frame)
+        input_frame.pack(pady=10, fill='x')
+        ttk.Label(input_frame, text="📅 Date for Daily Summary:").pack(side='left', padx=5)
+        self.summary_date_entry = ttk.Entry(input_frame, width=12, font=('Segoe UI', 10))
+        self.summary_date_entry.pack(side='left', padx=5)
+        self.summary_date_entry.insert(0, datetime.date.today().isoformat())
+
+        ttk.Button(input_frame, text="📆 Daily", style='Primary.TButton',
+                   command=self.show_daily_summary).pack(side='left', padx=5)
+        ttk.Button(input_frame, text="📈 Weekly", style='Primary.TButton',
+                   command=self.show_weekly_summary).pack(side='left', padx=5)
+
+        # Text area for results
+        self.summary_text = tk.Text(self.summary_frame, height=15, width=85,
+                                    font=('Segoe UI', 10), bg='white', fg='#2c3e50',
+                                    relief='solid', bd=1)
+        self.summary_text.pack(pady=10, padx=10, fill='both', expand=True)

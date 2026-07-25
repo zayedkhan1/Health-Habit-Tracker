@@ -134,3 +134,33 @@ class HealthApp:
         self.tracker.add_record(record)
         messagebox.showinfo("Success", "Record saved successfully.")
         self.clear_add_fields()
+       
+       
+         # ---------- View Records Tab ----------
+    def setup_view_frame(self):
+        # Treeview with alternating row colors
+        self.tree = ttk.Treeview(self.view_frame, columns=('Date', 'Sleep', 'Water',
+                                                           'Exercise', 'Screen', 'Study'),
+                                 show='headings', selectmode='browse')
+        for col in ['Date', 'Sleep', 'Water', 'Exercise', 'Screen', 'Study']:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=120, anchor='center')
+
+        # Scrollbar
+        scrollbar = ttk.Scrollbar(self.view_frame, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scrollbar.set)
+        self.tree.pack(side='left', fill='both', expand=True, padx=(0, 5))
+        scrollbar.pack(side='right', fill='y')
+
+        # Button panel
+        btn_panel = ttk.Frame(self.view_frame)
+        btn_panel.pack(fill='x', pady=10)
+
+        ttk.Button(btn_panel, text="🔄 Refresh", style='Primary.TButton',
+                   command=self.refresh_view).pack(side='left', padx=5)
+        ttk.Button(btn_panel, text="✏️ Edit Selected", style='Primary.TButton',
+                   command=self.edit_record).pack(side='left', padx=5)
+        ttk.Button(btn_panel, text="🗑️ Delete Selected", style='Danger.TButton',
+                   command=self.delete_record).pack(side='left', padx=5)
+
+        self.refresh_view()

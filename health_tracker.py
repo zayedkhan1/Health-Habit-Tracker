@@ -1,8 +1,9 @@
 import numpy as np
 import json
 import os
-import datetime
+
 from record import HealthRecord
+from datetime import datetime, timedelta
 
 class HealthTracker:
 
@@ -30,147 +31,64 @@ class HealthTracker:
             else:
                 return None
         return None    
-
-
-    def delete_record():
-        pass
-
-    def get_all_records():
-        pass
-
-    def get_dates_set():
-        pass
-
-    def get_weekly_records():
-      pass
-
-
-    def weekly_summary(self, end_date=None):
-      
-        weekly_data = self.get_weekly_records(end_date)
-        if not weekly_data:
-            return None
-
-        sleep = []
-        water = []
-        exercise = []
-        screen = []
-        study = []
-
-        for record in weekly_data:
-            sleep.append(record.sleep)
-            water.append(record.water)
-            exercise.append(record.exercise)
-            screen.append(record.screen_time)
-            study.append(record.study_hours)
-
-        sleep_time = np.array(sleep)
-        water_consume = np.array(water)
-        exercise_time = np.array(exercise)
-        screen_time = np.array(screen)
-        study_hour = np.array(study)
-
-        avg_sleep = np.mean(sleep_time)
-        avg_water = np.mean(water_consume)
-        avg_exercise = np.mean(exercise_time)
-        avg_screen = np.mean(screen_time)
-        avg_study = np.mean(study_hour)
-
-        total_sleep = np.sum(sleep_time)
-        total_water = np.sum(water_consume)
-        total_exercise = np.sum(exercise_time)
-        total_screen = np.sum(screen_time)
-        total_study = np.sum(study_hour)
-
-        return {
-            'average': {
-                'sleep': avg_sleep,
-                'water': avg_water,
-                'exercise': avg_exercise,
-                'screen_time': avg_screen,
-                'study_hours': avg_study
-            },
-            'total': {
-                'sleep': total_sleep,
-                'water': total_water,
-                'exercise': total_exercise,
-                'screen_time': total_screen,
-                'study_hours': total_study
-            },
-            'numOfDays': len(weekly_data)
-        }
+              
     
-    def get_warnings(self, date=None):
-
-        if date is None:
-            date = datetime.today().date().isoformat()
-
-        record = self.get_record(date)
-
-        warnings = []
-
-        if record is None:
-            return warnings
-
-        if record.sleep < 7:
-            warnings.append("Sleep is too low.")
-        elif record.sleep > 9:
-            warnings.append("Sleep is too high.")
-
-      
-        if record.water < 8:
-            warnings.append("Water intake is too low.")
-        elif record.water > 12:
-            warnings.append("Water intake is too high.")
-
-        
-        if record.exercise < 30:
-            warnings.append("Exercise is too low.")
-        elif record.exercise > 60:
-            warnings.append("Exercise is too high.")
-
-      
-        if record.screen_time > 3:
-            warnings.append("Screen time is too high.")
-
-        
-        if record.study_hours < 2:
-            warnings.append("Study hours are too low.")
-        elif record.study_hours > 4:
-            warnings.append("Study hours are too high.")
-
-        return warnings
     
-    def save_data(self):
-        data = []
+    
+
+    def get_record(self, date):
+        
+        for record in self.records:
+            if record.date == date:
+                return record
+        return None
+
+
+    def delete_record(self, date):
+        
+        new_records = []
 
         for record in self.records:
+            if record.date != date:
+                new_records.append(record)
 
-            dict = record.json_data()
+        self.records = new_records
+        self.save_data()
 
-            data.append(dict)
+    def get_all_records(self):
+        
+        return self.records
 
-        file = open(self.filename, "w")
 
-        json.dump(data, file, indent=2)
+    def get_dates_set(self):
+        
+        dates = set()
 
-        file.close()
+        for record in self.records:
+            dates.add(record.date)
 
-    def load_data(self):
+        return dates
 
-        if not os.path.exists(self.filename):
-            self.records = []
-            return
 
-        try:
-            with open(self.filename, "r") as file:
-                data = json.load(file)
+    def get_weekly_records(self, end_date=None):
+        
 
-            self.records = []
+        if end_date is None:
+            end_date = datetime.today().date()
+        else:
+            if type(end_date) == str:
+                end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-            for item in data:
-                record = HealthRecord.from_dict(item)
-                self.records.append(record)
+        start_date = end_date - timedelta(days=6)
 
-        except:
-            self.records = []
+        weekly_records = []
+
+        for record in self.records:
+            current_date = datetime.strptime(record.date, "%Y-%m-%d").date()
+
+            if current_date >= start_date and current_date <= end_date:
+                weekly_records.append(record)
+
+        return weekly_records
+
+        

@@ -209,3 +209,41 @@ class HealthApp:
             entry.grid(row=i+1, column=1, padx=10, pady=8)
             entry.insert(0, values[i+1])  # values[0] is date
             entries[field] = entry
+
+        def save_edit():
+            try:
+                sleep = float(entries['Sleep (hours)'].get().strip())
+                water = float(entries['Water (glasses)'].get().strip())
+                exercise = float(entries['Exercise (minutes)'].get().strip())
+                screen = float(entries['Screen Time (hours)'].get().strip())
+                study = float(entries['Study Hours (hours)'].get().strip())
+            except ValueError:
+                messagebox.showerror("Invalid Input", "Please enter numeric values.")
+                return
+            if any(v < 0 for v in [sleep, water, exercise, screen, study]):
+                messagebox.showerror("Invalid Input", "Values cannot be negative.")
+                return
+            record = HealthRecord(date, sleep, water, exercise, screen, study)
+            self.tracker.add_record(record)  # update
+            edit_win.destroy()
+            self.refresh_view()
+            messagebox.showinfo("Success", "Record updated.")
+
+        btn_frame = ttk.Frame(edit_win)
+        btn_frame.grid(row=len(fields)+1, column=0, columnspan=2, pady=20)
+        ttk.Button(btn_frame, text="💾 Save", style='Success.TButton',
+                   command=save_edit).pack(side='left', padx=10)
+        ttk.Button(btn_frame, text="❌ Cancel", style='Primary.TButton',
+                   command=edit_win.destroy).pack(side='left', padx=10)
+
+    def delete_record(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("No selection", "Please select a record to delete.")
+            return
+        values = self.tree.item(selected[0], 'values')
+        date = values[0]
+        if messagebox.askyesno("Confirm Delete", f"Delete record for {date}?"):
+            self.tracker.delete_record(date)
+            self.refresh_view()
+            messagebox.showinfo("Success", "Record deleted.")

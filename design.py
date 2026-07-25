@@ -299,3 +299,27 @@ class HealthApp:
             self.summary_text.insert(tk.END, "\nTotals:\n")
             for key, val in summary['total'].items():
                 self.summary_text.insert(tk.END, f"  • {key.replace('_', ' ').title()}: {val:.2f}\n")
+     # ---------- Warnings Tab ----------
+    def setup_warning_frame(self):
+        ttk.Label(self.warning_frame, text="⚠️ Health Warnings for Today",
+                  font=('Segoe UI', 12, 'bold')).pack(pady=5)
+
+        self.warning_text = tk.Text(self.warning_frame, height=12, width=80,
+                                    font=('Segoe UI', 10), bg='white', fg='#2c3e50',
+                                    relief='solid', bd=1)
+        self.warning_text.pack(pady=10, padx=10, fill='both', expand=True)
+
+        ttk.Button(self.warning_frame, text="🔄 Refresh Warnings", style='Primary.TButton',
+                   command=self.refresh_warnings).pack(pady=10)
+        self.refresh_warnings()
+
+    def refresh_warnings(self):
+        self.warning_text.delete(1.0, tk.END)
+        today = datetime.date.today().isoformat()
+        warnings = self.tracker.get_warnings(today)
+        if not warnings:
+            self.warning_text.insert(tk.END, "✅ No warnings for today. Keep up the good habits!")
+        else:
+            self.warning_text.insert(tk.END, "The following metrics need attention:\n\n")
+            for warn in warnings:
+                self.warning_text.insert(tk.END, f"• {warn}\n")

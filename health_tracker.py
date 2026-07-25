@@ -1,15 +1,16 @@
 import numpy as np
 import json
 import os
-
-from record import HealthRecord
 from datetime import datetime, timedelta
+from record import HealthRecord
+
 
 class HealthTracker:
 
     def __init__(self,filename='health_tracker.py'):
         self.filename=filename
         self.records=[]
+        self.load_data()
 
 
 
@@ -24,16 +25,77 @@ class HealthTracker:
         self.records.append(record)
         self.save_data()
 
-    def get_record(self,date):
-        for record in self.records:
-            if record.date==date:
-                return record
-            else:
-                return None
-        return None    
-              
-    
-    
+    # def get_record(self,date):
+    #     for record in self.records:
+    #         if record.date==date:
+    #             return record
+    #         else:
+    #             return None
+    #     return None    
+
+
+    def daily_summary(self, date):
+        """Return a dictionary summary for a single day, or None if no record."""
+        record = self.get_record(date)
+        if record:
+            return record.json_data()
+        return None
+
+
+    def weekly_summary(self, end_date=None):
+      
+        weekly_data = self.get_weekly_records(end_date)
+        if not weekly_data:
+            return None
+
+        sleep = []
+        water = []
+        exercise = []
+        screen = []
+        study = []
+
+        for record in weekly_data:
+            sleep.append(record.sleep)
+            water.append(record.water)
+            exercise.append(record.exercise)
+            screen.append(record.screen_time)
+            study.append(record.study_hour)
+
+        sleep_time = np.array(sleep)
+        water_consume = np.array(water)
+        exercise_time = np.array(exercise)
+        screen_time = np.array(screen)
+        study_hour = np.array(study)
+
+        avg_sleep = np.mean(sleep_time)
+        avg_water = np.mean(water_consume)
+        avg_exercise = np.mean(exercise_time)
+        avg_screen = np.mean(screen_time)
+        avg_study = np.mean(study_hour)
+
+        total_sleep = np.sum(sleep_time)
+        total_water = np.sum(water_consume)
+        total_exercise = np.sum(exercise_time)
+        total_screen = np.sum(screen_time)
+        total_study = np.sum(study_hour)
+
+        return {
+            'average': {
+                'sleep': avg_sleep,
+                'water': avg_water,
+                'exercise': avg_exercise,
+                'screen_time': avg_screen,
+                'study_hours': avg_study
+            },
+            'total': {
+                'sleep': total_sleep,
+                'water': total_water,
+                'exercise': total_exercise,
+                'screen_time': total_screen,
+                'study_hours': total_study
+            },
+            'numOfDays': len(weekly_data)
+        }
     
 
     def get_record(self, date):
@@ -62,6 +124,15 @@ class HealthTracker:
 
     def get_dates_set(self):
         
+        if record.study_hour < 2:
+            warnings.append("Study hours are too low.")
+        elif record.study_hour > 4:
+            warnings.append("Study hours are too high.")
+
+        return warnings
+    
+    def save_data(self):
+        data = []
         dates = set()
 
         for record in self.records:

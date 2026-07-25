@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2026-07-18",
+    "sleep": 4.0,
+    "water": 4.0,
+    "exercise": 5.0,
+    "screen_time": 2.0,
+    "study_hour": 1.0
+  },
+  {
+    "date": "2026-07-22",
+    "sleep": 4.0,
+    "water": 5.0,
+    "exercise": 3.0,
+    "screen_time": 2.0,
+    "study_hour": 6.0
+  }
+]

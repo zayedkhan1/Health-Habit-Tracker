@@ -7,7 +7,7 @@ from record import HealthRecord
 
 class HealthTracker:
 
-    def __init__(self,filename='health_tracker.py'):
+    def __init__(self,filename='health.json'):
         self.filename=filename
         self.records=[]
         self.load_data()
@@ -33,6 +33,72 @@ class HealthTracker:
     #             return None
     #     return None    
 
+    def get_record(self, date):
+            
+        for record in self.records:
+            if record.date == date:
+                return record
+            return None
+    
+    
+    def delete_record(self, date):
+            
+        new_records = []
+    
+        for record in self.records:
+            if record.date != date:
+                new_records.append(record)
+    
+            self.records = new_records
+            self.save_data()
+    
+    def get_all_records(self):
+            
+        return self.records
+    
+    
+    def get_dates_set(self):
+            
+        if self.record.study_hour < 2:
+            self.warnings.append("Study hours are too low.")
+        elif self.record.study_hour > 4:
+            self.warnings.append("Study hours are too high.")
+    
+        return self.warnings
+        
+    def save_data(self):
+        data = []
+        dates = set()
+    
+        for record in self.records:
+            dates.add(record.date)
+    
+        return dates
+    
+    
+    def get_weekly_records(self, end_date=None):
+            
+    
+        if end_date is None:
+            end_date = datetime.today().date()
+        else:
+            if type(end_date) == str:
+                end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    
+        start_date = end_date - timedelta(days=6)
+    
+        weekly_records = []
+    
+        for record in self.records:
+            current_date = datetime.strptime(record.date, "%Y-%m-%d").date()
+    
+            if current_date >= start_date and current_date <= end_date:
+                weekly_records.append(record)
+    
+        return weekly_records
+    
+            
+    
 
     def daily_summary(self, date):
         """Return a dictionary summary for a single day, or None if no record."""
@@ -98,68 +164,4 @@ class HealthTracker:
         }
     
 
-    def get_record(self, date):
-        
-        for record in self.records:
-            if record.date == date:
-                return record
-        return None
-
-
-    def delete_record(self, date):
-        
-        new_records = []
-
-        for record in self.records:
-            if record.date != date:
-                new_records.append(record)
-
-        self.records = new_records
-        self.save_data()
-
-    def get_all_records(self):
-        
-        return self.records
-
-
-    def get_dates_set(self):
-        
-        if record.study_hour < 2:
-            warnings.append("Study hours are too low.")
-        elif record.study_hour > 4:
-            warnings.append("Study hours are too high.")
-
-        return warnings
     
-    def save_data(self):
-        data = []
-        dates = set()
-
-        for record in self.records:
-            dates.add(record.date)
-
-        return dates
-
-
-    def get_weekly_records(self, end_date=None):
-        
-
-        if end_date is None:
-            end_date = datetime.today().date()
-        else:
-            if type(end_date) == str:
-                end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-
-        start_date = end_date - timedelta(days=6)
-
-        weekly_records = []
-
-        for record in self.records:
-            current_date = datetime.strptime(record.date, "%Y-%m-%d").date()
-
-            if current_date >= start_date and current_date <= end_date:
-                weekly_records.append(record)
-
-        return weekly_records
-
-        

@@ -38,3 +38,71 @@ class HealthApp:
         self.setup_view_frame()
         self.setup_summary_frame()
         self.setup_warning_frame()
+    def setup_styles(self):
+        style = ttk.Style()
+        style.theme_use('clam')  # modern base theme
+
+        # Configure colors
+        style.configure('TFrame', background='#f0f4f8')
+        style.configure('TLabel', background='#f0f4f8', foreground='#2c3e50', font=('Segoe UI', 10))
+        style.configure('TButton', font=('Segoe UI', 10), padding=6)
+        style.map('TButton',
+                  background=[('active', '#3498db'), ('pressed', '#2980b9')],
+                  foreground=[('active', 'white')])
+
+        # Custom button styles
+        style.configure('Success.TButton', background='#27ae60', foreground='white')
+        style.map('Success.TButton',
+                  background=[('active', '#2ecc71'), ('pressed', '#1e8449')])
+        style.configure('Danger.TButton', background='#e74c3c', foreground='white')
+        style.map('Danger.TButton',
+                  background=[('active', '#c0392b'), ('pressed', '#922b21')])
+        style.configure('Primary.TButton', background='#2c3e50', foreground='white')
+        style.map('Primary.TButton',
+                  background=[('active', '#34495e'), ('pressed', '#1a252f')])
+
+        # Treeview styling
+        style.configure('Treeview', background='white', foreground='#2c3e50',
+                        rowheight=28, fieldbackground='white')
+        style.map('Treeview', background=[('selected', '#3498db')])
+
+        # Notebook tabs
+        style.configure('TNotebook', background='#f0f4f8', tabmargins=[2, 5, 2, 0])
+        style.configure('TNotebook.Tab', background='#d5dbe0', padding=[12, 4],
+                        font=('Segoe UI', 10, 'bold'))
+        style.map('TNotebook.Tab',
+                  background=[('selected', '#2c3e50'), ('active', '#34495e')],
+                  foreground=[('selected', 'white'), ('active', 'white')])
+
+    # ---------- Add Record Tab ----------
+    def setup_add_frame(self):
+        fields = ['Date (YYYY-MM-DD)', 'Sleep (hours)', 'Water (glasses)',
+                  'Exercise (minutes)', 'Screen Time (hours)', 'Study Hours (hours)']
+        self.add_entries = {}
+
+        # Title
+        title = ttk.Label(self.add_frame, text="📝 Add or Update Daily Record",
+                          font=('Segoe UI', 14, 'bold'), foreground='#2c3e50')
+        title.grid(row=0, column=0, columnspan=3, pady=(0, 20))
+
+        for i, field in enumerate(fields):
+            label = ttk.Label(self.add_frame, text=field, font=('Segoe UI', 10))
+            label.grid(row=i+1, column=0, padx=10, pady=8, sticky='e')
+            entry = ttk.Entry(self.add_frame, width=25, font=('Segoe UI', 10))
+            entry.grid(row=i+1, column=1, padx=10, pady=8)
+            self.add_entries[field] = entry
+
+        # Default date to today
+        self.add_entries['Date (YYYY-MM-DD)'].insert(0, datetime.date.today().isoformat())
+
+        # Buttons
+        btn_frame = ttk.Frame(self.add_frame)
+        btn_frame.grid(row=len(fields)+1, column=0, columnspan=3, pady=20)
+
+        add_btn = ttk.Button(btn_frame, text="💾 Save Record", style='Success.TButton',
+                             command=self.add_record)
+        add_btn.pack(side='left', padx=10)
+
+        clear_btn = ttk.Button(btn_frame, text="🗑️ Clear Fields", style='Primary.TButton',
+                               command=self.clear_add_fields)
+        clear_btn.pack(side='left', padx=10)
